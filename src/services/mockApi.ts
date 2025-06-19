@@ -1,10 +1,7 @@
 // Mock API service for dashboard data
 export interface FilterParams {
-  dateRange: {
-    from: string;
-    to: string;
-  };
-  region: string;
+  month: number;
+  year: number;
 }
 
 export interface KPIData {
@@ -28,11 +25,6 @@ export interface TableData {
 
 // Mock API endpoints
 export const mockApi = {
-  // Filter options
-  getRegions: async (): Promise<string[]> => {
-    await delay(300);
-    return ['North', 'South', 'East', 'West', 'All Regions'];
-  },
 
   // Fleet Dashboard APIs
   fleet: {

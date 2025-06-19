@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { Truck, Activity, Wrench, Clock, Target, DollarSign, Ticket, TrendingUp, CheckCircle, Users, Award } from 'lucide-react';
 import KPICard from '@/components/ui/kpi-card';
 import DashboardFilters, { FilterState } from './DashboardFilters';
-import { useDashboardData, useRegions } from '@/hooks/useDashboardData';
+import { useDashboardData } from '@/hooks/useDashboardData';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, AreaChart, Area } from 'recharts';
-import { format } from 'date-fns';
 
 // Icon mapping
 const iconMap = {
@@ -28,22 +27,15 @@ interface DashboardTemplateProps {
 }
 
 const DashboardTemplate = ({ type, title, description }: DashboardTemplateProps) => {
-  const { regions, isLoading: regionsLoading } = useRegions();
-  
+  const currentDate = new Date();
   const [filters, setFilters] = useState<FilterState>({
-    dateRange: {
-      from: new Date(new Date().setDate(new Date().getDate() - 30)),
-      to: new Date()
-    },
-    region: 'All Regions'
+    month: currentDate.getMonth() + 1,
+    year: currentDate.getFullYear()
   });
 
   const filterParams = {
-    dateRange: {
-      from: format(filters.dateRange.from, 'yyyy-MM-dd'),
-      to: format(filters.dateRange.to, 'yyyy-MM-dd')
-    },
-    region: filters.region
+    month: filters.month,
+    year: filters.year
   };
 
   const { data, isLoading, error } = useDashboardData(type, filterParams);
@@ -75,8 +67,7 @@ const DashboardTemplate = ({ type, title, description }: DashboardTemplateProps)
       <DashboardFilters
         filters={filters}
         onFiltersChange={setFilters}
-        regions={regions}
-        isLoading={regionsLoading || isLoading}
+        isLoading={isLoading}
       />
 
       {/* KPI Cards */}

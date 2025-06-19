@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { mockApi, FilterParams, KPIData, ChartData, TableData } from '@/services/mockApi';
 
 export interface DashboardData {
@@ -13,8 +13,11 @@ export const useDashboardData = (dashboardType: 'fleet' | 'afterSales' | 'sales'
     charts: [],
     table: { headers: [], rows: [] }
   });
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Memoize filter params to prevent unnecessary re-renders
+  const memoizedFilters = useMemo(() => filters, [filters.month, filters.year]);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -67,7 +70,7 @@ export const useDashboardData = (dashboardType: 'fleet' | 'afterSales' | 'sales'
     } finally {
       setIsLoading(false);
     }
-  }, [dashboardType, filters]);
+  }, [dashboardType, memoizedFilters]);
 
   useEffect(() => {
     fetchData();
@@ -81,25 +84,4 @@ export const useDashboardData = (dashboardType: 'fleet' | 'afterSales' | 'sales'
   };
 };
 
-export const useRegions = () => {
-  const [regions, setRegions] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchRegions = async () => {
-      try {
-        const regionData = await mockApi.getRegions();
-        setRegions(regionData);
-      } catch (error) {
-        console.error('Failed to fetch regions:', error);
-        setRegions(['All Regions']);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRegions();
-  }, []);
-
-  return { regions, isLoading };
-};
+// No longer need useRegions since we removed region filter
